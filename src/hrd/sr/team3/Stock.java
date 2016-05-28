@@ -235,9 +235,10 @@ public class Stock {
 
 		//method write
 		public void write() {
+			System.out.println("==========Inserting new Product to Database==========");
 			reverseTable();
-			id = currentID + 1;
-			System.out.println("Product ID: " + id);
+			int ProID = table.size() + 1;
+			System.out.println("New Product ID: " + ProID);
 			
 			System.out.print("Name > ");
 			name = sc.next();
@@ -249,29 +250,187 @@ public class Stock {
 			sQty = sc.nextInt();
 			
 			System.out.println("Imported Date > " + fdate);
-			table.add(new Product(id, name, unitPrice, sQty, fdate));
-			Collections.reverse(table);
+			System.out.print("Are you sure to save this new record? [Y/N] > ");
+			String check = sc.next();
+			switch (check) {
+			case "y" : case "Y" : table.add(new Product(ProID, name, unitPrice, sQty, fdate)); Collections.reverse(table); break;
+			case "n" : case "N" : Collections.reverse(table); break;
+			default:
+				System.out.println("You have entered the invalid command.");
+				System.out.print("Are you sure to save this new record? [Y/N] > ");
+				check = sc.next();
+				break;
+			}
 			
 			
 			displayingProduct(page, row);
 			
 		}
 		
+		//Product Deltail
+		public void showProductDetail(int id){
+			int index = id - 1;
+			name = table.get(index).getName();
+			unitPrice = table.get(index).getUnitPrice();
+			sQty = table.get(index).getsQty();
+			String date = table.get(index).getiDate();
+			System.out.println("Last Updated: " + date);
+			System.out.println("Product ID: " + id);
+			System.out.println("Product Name: " + name);
+			System.out.println("Unit Price: $" + unitPrice);
+			System.out.println("Stocked Quantity: " + sQty);
+		}
+		
 		//method read
 		public void read() {
-			System.out.println("READER !");
+			reverseTable();
+			System.out.print("Product ID > ");
+			int ProID = sc.nextInt();
+			if(ProID > table.size()){
+				System.out.println("Could not be found the product that is matched to your input Product ID!");
+			}else{
+				System.out.println("==========Detail information of Product with ID: " + ProID + "==========");
+				showProductDetail(ProID);
+			}
+			Collections.reverse(table);
+			displayingProduct(page, row);
+			
 		}
 		
 		//method update
 		public void update() {
-			System.out.println("UPDATER !");
+			reverseTable();
+			System.out.print("Product ID > ");
+			int ProID = sc.nextInt();
+			int index = ProID - 1;
+			if(ProID > table.size()){
+				System.out.println("Could not be found the product that is matched to your input Product ID!");
+			}else{
+			System.out.println("==========Update information of Product with ID: " + ProID + "==========");
+			showProductDetail(ProID);
+			
+			System.out.print("What do you want to update?\n (Al)All\t(N)Name\t(Up)Unit Price\t(Q)Stock Quantity\t(E)Exit > ");
+			String choose = sc.next();
+				switch (choose) {
+				case "Al" : case "al" : updateAll(ProID); break;
+				case "N"  : case "n"  : updateName(ProID); break;
+				case "Up" : case "up" : updateUnitPrice(ProID); break;
+				case "Q"  : case "q"  : updateStockQty(ProID); break;
+				case "E"  : case "e"  : Collections.reverse(table);displayingProduct(page, row); break;
+				default:
+					System.out.println("You have entered the invalid command.");
+					System.out.print("What do you want to update?\n (Al)All\t(N)Name\t(Up)Unit Price\t(Q)Stock Quantity\t(E)Exit > ");
+					choose = sc.next();
+					break;
+				}
+			}
+
+		}
+		public void updateAll(int id){
+			int index = id - 1;
+			System.out.print("Name > ");
+			name = sc.next();
+			
+			System.out.print("Unit Price > ");
+			unitPrice = sc.nextDouble();
+			
+			System.out.print("Stock Quantity > ");
+			sQty = sc.nextInt();
+			
+			System.out.print("Are you sure to update this record? [Y/N] > ");
+			String check = sc.next();
+			switch (check) {
+			case "y" : case "Y" : table.set(index, new Product(id, name, unitPrice, sQty, fdate)); Collections.reverse(table); break;
+			case "n" : case "N" : Collections.reverse(table); break;
+			default:
+				System.out.println("You have entered the invalid command.");
+				System.out.print("Are you sure to update this record? [Y/N] > ");
+				check = sc.next();
+				break;
+			}
+			displayingProduct(page, row);
+		}
+		public void updateName(int id){
+			int index = id - 1;
+			System.out.print("Name > ");
+			name = sc.next();
+			System.out.print("Are you sure to update this record? [Y/N] > ");
+			String check = sc.next();
+			switch (check) {
+			case "y" : case "Y" : table.set(index, new Product(id, name, unitPrice, sQty, fdate)); Collections.reverse(table); break;
+			case "n" : case "N" : Collections.reverse(table); break;
+			default:
+				System.out.println("You have entered the invalid command.");
+				System.out.print("Are you sure to update this record? [Y/N] > ");
+				check = sc.next();
+				break;
+			}
+			displayingProduct(page, row);
+		}
+		public void updateUnitPrice(int id){
+			int index = id - 1;
+			System.out.print("Unit Price > ");
+			unitPrice = sc.nextDouble();
+			System.out.print("Are you sure to update this record? [Y/N] > ");
+			String check = sc.next();
+			switch (check) {
+			case "y" : case "Y" : table.set(index, new Product(id, name, unitPrice, sQty, fdate)); Collections.reverse(table); break;
+			case "n" : case "N" : Collections.reverse(table); break;
+			default:
+				System.out.println("You have entered the invalid command.");
+				System.out.print("Are you sure to update this record? [Y/N] > ");
+				check = sc.next();
+				break;
+			}
+			displayingProduct(page, row);
+		}
+		public void updateStockQty(int id){
+			int index = id - 1;
+			System.out.print("Stock Quantity > ");
+			sQty = sc.nextInt();
+			System.out.print("Are you sure to update this record? [Y/N] > ");
+			String check = sc.next();
+			switch (check) {
+			case "y" : case "Y" : table.set(index, new Product(id, name, unitPrice, sQty, fdate)); Collections.reverse(table); break;
+			case "n" : case "N" : Collections.reverse(table); break;
+			default:
+				System.out.println("You have entered the invalid command.");
+				System.out.print("Are you sure to update this record? [Y/N] > ");
+				check = sc.next();
+				break;
+			}
+			displayingProduct(page, row);
 		}
 		
 		//method delete
 		public void delete() {
-			System.out.println("DELETER !");
+			reverseTable();
+			System.out.print("Product ID > ");
+			int ProID = sc.nextInt();
+			int index = ProID - 1;
+			if(ProID > table.size()){
+				System.out.println("Could not be found the product that is matched to your input Product ID!");
+			}else{
+				System.out.println("==========Delete Product from database with ID: " + ProID + "==========");
+				showProductDetail(ProID);
+				
+				System.out.print("Are you sure to delete this record? [Y/N] > ");
+				String check = sc.next();
+				switch (check) {
+				case "y" : case "Y" : table.remove(index); Collections.reverse(table); break;
+				case "n" : case "N" : Collections.reverse(table); break;
+				default:
+					System.out.println("You have entered the invalid command.");
+					System.out.print("Are you sure to update this record? [Y/N] > ");
+					check = sc.next();
+					break;
+				}
+			}
+			displayingProduct(page, row);
 		}
 		
+		
+		//Pagination and search not yet done
 		//method toFirst
 		public void tofirst() {
 			System.out.println("TO FIRST !");
@@ -302,6 +461,9 @@ public class Stock {
 			int goPage = sc.nextInt();
 			displayingProduct(goPage, row);
 		}
+		//End description of Pagination and Search 
+		 
+		
 		
 		//Set Showing record
 		public void setShowingRecord(){
