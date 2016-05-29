@@ -11,24 +11,33 @@ import java.io.ObjectOutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
+import org.nocrala.tools.texttablefmt.BorderStyle;
+import org.nocrala.tools.texttablefmt.CellStyle;
+import org.nocrala.tools.texttablefmt.CellStyle.HorizontalAlign;
+import org.nocrala.tools.texttablefmt.ShownBorders;
+import org.nocrala.tools.texttablefmt.Table;
+
 public class Stock {
 	//Declaration part
 	int currentID;
-	Scanner sc = new Scanner(System.in);
+	static Scanner sc = new Scanner(System.in);
 	public static ArrayList<Product> table = null;
-	//public ArrayList<Product> table = null;
-	int page, row;
-	int setRow;
-	DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-	Date date = new Date();
-	String fdate = dateFormat.format(date).toString();
-	private static final String validLetter = "[*wWrRdDuUfFlLnNpPsSgGEe]|(se|Se)", validNumber = "-?\\d+(\\.\\d+)?";
+	static //public ArrayList<Product> table = null;
+	int page;
+	static int row;
+	static int setRow;
+	static DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+	static Date date = new Date();
+	static String fdate = dateFormat.format(date).toString();
+	private static final String validLetter = "[*wWrRdDuUfFlLnNpPsSgGEe]|(se|Se)|(sa|Sa)", validNumber = "-?\\d+(\\.\\d+)?";
 	static String error_al = "You have type a wrong command!"; 
+	static String Search;
 	
 	
 	// method for performing insertion task
@@ -77,20 +86,17 @@ public class Stock {
 			displayingProduct(page, row);
 
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
 	
 	// returning total of page
-	public int totalPages(int totalRows, int row) {
+	public static int totalPages(int totalRows, int row) {
 		double page;
 		if(totalRows%row == 0){
 		page = Math.ceil(totalRows / row);
@@ -104,25 +110,41 @@ public class Stock {
 	
 	
 	//Selecting record to show based on starting page
-	private int selectRecordByStartPage(int startPage, int row) {
+	private static int selectRecordByStartPage(int startPage, int row) {
 		return (startPage - 1) * row;
 	}
 
-	public void chooseOption() {
+	public static void chooseOption() {
 		System.out.print("Option > ");
+		shortCutCommands();
 	}
 	
 	//shortCutCommands using in this System
-	public void shortCutCommands() {
+	public static void shortCutCommands() {
 			@SuppressWarnings("resource")
 			//Scanner scan = new Scanner(System.in);
 			String str = sc.next();
 			if (ifletterX(str)) {
 				char x = 0;
 				if (str.length() > 1) {
-					if (str.equals("Se")||str.equals("se"))
+					if (str.equals("Se")||str.equals("se")){
 					System.out.print("Set showing record: ");
 					setShowingRecord();
+					}else if(str.equals("Sa")||str.equals("sa")){
+						
+						System.out.print("Are you sure to update this record? [Y/N] > ");
+						String check = sc.next();
+						switch (check) {
+						case "y" : case "Y" : System.out.println("Your data had been successfully saved to database."); save();
+						System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"); break;
+						case "n" : case "N" : Collections.reverse(table); break;
+						default:
+							System.out.println("You have entered the invalid command.");
+							System.out.print("Are you sure to update this record? [Y/N] > ");
+							check = sc.next();
+							break;
+						}	
+					}
 				}else {
 					x = str.charAt(0);
 					switch (x) {
@@ -135,7 +157,7 @@ public class Stock {
 					case 'l': case 'L': tolast(); break;
 					case 'n': case 'N': tonext(); break;
 					case 'p': case 'P': toprevious(); break;
-					case 's': case 'S': search(); break;
+					case 's': case 'S': search(Search); break;
 					case 'g': case 'G': System.out.print("Go to specific page: "); goTo(); break;
 					case 'e': case 'E': System.out.println("GoodBye");System.exit(0); break;
 					}
@@ -148,7 +170,7 @@ public class Stock {
 	
 	
 	//method for control input value M,m = get from menu, T,t = get as text input 
-	public void inputM(String Option) {
+	public static void inputM(String Option) {
 		boolean p = Pattern.compile("[mMtT]").matcher(Option).matches();		
 		if (p) {
 			if (Option.equals("M")||Option.equals("m")) {
@@ -164,7 +186,7 @@ public class Stock {
 	}
 	
 	//Get all text return string
-	public String getText() {
+	public static String getText() {
 		@SuppressWarnings("resource")
 		Scanner scanner = new Scanner(System.in).useDelimiter(";");
 		String readString = "";
@@ -174,67 +196,96 @@ public class Stock {
 	}
 	
 	//method check for number when input for menu
-			public boolean ifnumber(String str) {
+			public static boolean ifnumber(String str) {
 				boolean p = Pattern.compile(validNumber).matcher(str).matches();
 				return p;
 			}
 			
 	//method check for letter when input for menu
-	public boolean ifletterX(String str) {
+	public static boolean ifletterX(String str) {
 		boolean p = Pattern.compile(validLetter).matcher(str).matches();
 		return p;
 	}
 	
 	
-	int id;
-	String name;
-	double unitPrice;
-	int sQty;
+	static int id;
+	static String name;
+	static double unitPrice;
+	static int sQty;
 	//method switch to method responder
 		public void indexer(){
 			System.out.println("INDEXER !");
 		}
 		
 		// For Displaying Product
-		public void displayingProduct(int page, int row) {
-			//table = new ArrayList<>();
-			//table.addAll(table);
-			
+		public static void displayingProduct(int page, int row) {
+			int col = 5;
 			if(setRow>row)
 				row = setRow;
 			int startPage = selectRecordByStartPage(page, row);
 			int pages = totalPages(table.size(), row);
-			// Header of Table
-			System.out.format(
-					" +---------------+----------------------+-----------------------+-----------------------+-----------------------+%n");
-			System.out.format("||\tID\t||\tNAME\t\t||\tUNIT PRICE($)\t||\tSTOCK QUANTITY\t||\tIMPORTED DATE\t||%n");
-			System.out.format(
-					" +---------------+----------------------+-----------------------+-----------------------+-----------------------+%n");
+			
+			Table t = new Table(5,BorderStyle.UNICODE_BOX_DOUBLE_BORDER,ShownBorders.ALL);
+			CellStyle numbers = new CellStyle(HorizontalAlign.center);
+			
+		// Header of Table
+			t.setColumnWidth(0, 15, 30);
+		    t.setColumnWidth(1, 15, 30);
+		    t.setColumnWidth(2, 15, 30);
+		    t.setColumnWidth(3, 15, 30);
+		    t.setColumnWidth(4, 15, 30);
+		    t.addCell("ID", numbers);
+		    t.addCell("name", numbers);
+		    t.addCell("Unit Price", numbers);
+		    t.addCell("Quantity", numbers);
+		    t.addCell("Imported Date",numbers);
+		    
+		 // Body of Table
+		 			for (int i = startPage; i < startPage + row; i++) {
+		 				if (i < table.size()) {
+		 					id = table.get(i).getId();
+		 					name = table.get(i).getName();
+		 					unitPrice = table.get(i).getUnitPrice();
+		 					sQty = table.get(i).getsQty();
+		 					String date = table.get(i).getiDate();
 
-			// Body of Table
-			for (int i = startPage; i < startPage + row; i++) {
-				if (i < table.size()) {
-					id = table.get(i).getId();
-					name = table.get(i).getName();
-					unitPrice = table.get(i).getUnitPrice();
-					sQty = table.get(i).getsQty();
-					String date = table.get(i).getiDate();
-					System.out.format("|| " + id + "\t||\t" + name + "\t||\t" + unitPrice + "\t\t||\t" + sQty + "\t\t||\t"
-							+ date + "\t||%n");
-					System.out.format(
-							" +---------------+----------------------+-----------------------+-----------------------+-----------------------+%n");
-				}
-			}
-			// Footer of Table
-			System.out.println("\n\t\t\t\t\tPage: " + page + "/" + pages + " =||= " + "Total: " + table.size() + "\t\t");
-			chooseOption();
-			shortCutCommands();
+		 			    	t.addCell(""+id, numbers);
+		 			    	t.addCell(""+name, numbers);
+		 			    	t.addCell(""+unitPrice, numbers);
+		 			    	t.addCell(""+sQty, numbers);
+		 			    	t.addCell(""+date, numbers);
+		 				}
+		 			}
+		 		System.out.println(t.render());
+		 		
+		 // Footer of Table
+				System.out.println("\n\t\t\tPage: " + page + "/" + pages + " =||= " + "Total: " + table.size() + "\t\t\n");
+			tableMeu();
+			
+			
 		}
+		
+		
+		//Table Menu
+				public static void tableMeu(){
+					Table t = new Table(1,BorderStyle.UNICODE_BOX_DOUBLE_BORDER,  
+							ShownBorders.SURROUND);
+					CellStyle row = new CellStyle(HorizontalAlign.center);
+					t.setColumnWidth(0, 79, 120);
+					t.addCell("*)Display | W)rite | R)ead | U)pdate | D)elete | F)irst | P)revious | "
+							+ "L)ast",row);
+					t.addCell(" ");
+					t.addCell("S)earch | G)o to | Se)t row | Sa)ve | B)ack up | Re)store | H)elp |"
+							+ " E)xit",row);		
+					System.out.println(t.render());
+					chooseOption();
+				}
+				//end menu
 		
 		
 
 		//method write
-		public void write() {
+		public static void write() {
 			System.out.println("==========Inserting new Product to Database==========");
 			reverseTable();
 			int ProID = table.size() + 1;
@@ -262,13 +313,13 @@ public class Stock {
 				break;
 			}
 			
-			
+			System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 			displayingProduct(page, row);
 			
 		}
 		
 		//Product Deltail
-		public void showProductDetail(int id){
+		public static void showProductDetail(int id){
 			int index = id - 1;
 			name = table.get(index).getName();
 			unitPrice = table.get(index).getUnitPrice();
@@ -282,10 +333,11 @@ public class Stock {
 		}
 		
 		//method read
-		public void read() {
+		public static void read() {
 			reverseTable();
 			System.out.print("Product ID > ");
 			int ProID = sc.nextInt();
+			System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 			if(ProID > table.size()){
 				System.out.println("Could not be found the product that is matched to your input Product ID!");
 			}else{
@@ -293,16 +345,20 @@ public class Stock {
 				showProductDetail(ProID);
 			}
 			Collections.reverse(table);
-			displayingProduct(page, row);
+			tableMeu();
+			
+			
 			
 		}
 		
 		//method update
-		public void update() {
+		public static void update() {
 			reverseTable();
 			System.out.print("Product ID > ");
 			int ProID = sc.nextInt();
 			int index = ProID - 1;
+			
+			System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 			if(ProID > table.size()){
 				System.out.println("Could not be found the product that is matched to your input Product ID!");
 			}else{
@@ -326,7 +382,9 @@ public class Stock {
 			}
 
 		}
-		public void updateAll(int id){
+		
+		//Update All data with the selected Product ID
+		public static void updateAll(int id){
 			int index = id - 1;
 			System.out.print("Name > ");
 			name = sc.next();
@@ -340,58 +398,8 @@ public class Stock {
 			System.out.print("Are you sure to update this record? [Y/N] > ");
 			String check = sc.next();
 			switch (check) {
-			case "y" : case "Y" : table.set(index, new Product(id, name, unitPrice, sQty, fdate)); Collections.reverse(table); break;
-			case "n" : case "N" : Collections.reverse(table); break;
-			default:
-				System.out.println("You have entered the invalid command.");
-				System.out.print("Are you sure to update this record? [Y/N] > ");
-				check = sc.next();
-				break;
-			}
-			displayingProduct(page, row);
-		}
-		public void updateName(int id){
-			int index = id - 1;
-			System.out.print("Name > ");
-			name = sc.next();
-			System.out.print("Are you sure to update this record? [Y/N] > ");
-			String check = sc.next();
-			switch (check) {
-			case "y" : case "Y" : table.set(index, new Product(id, name, unitPrice, sQty, fdate)); Collections.reverse(table); break;
-			case "n" : case "N" : Collections.reverse(table); break;
-			default:
-				System.out.println("You have entered the invalid command.");
-				System.out.print("Are you sure to update this record? [Y/N] > ");
-				check = sc.next();
-				break;
-			}
-			displayingProduct(page, row);
-		}
-		public void updateUnitPrice(int id){
-			int index = id - 1;
-			System.out.print("Unit Price > ");
-			unitPrice = sc.nextDouble();
-			System.out.print("Are you sure to update this record? [Y/N] > ");
-			String check = sc.next();
-			switch (check) {
-			case "y" : case "Y" : table.set(index, new Product(id, name, unitPrice, sQty, fdate)); Collections.reverse(table); break;
-			case "n" : case "N" : Collections.reverse(table); break;
-			default:
-				System.out.println("You have entered the invalid command.");
-				System.out.print("Are you sure to update this record? [Y/N] > ");
-				check = sc.next();
-				break;
-			}
-			displayingProduct(page, row);
-		}
-		public void updateStockQty(int id){
-			int index = id - 1;
-			System.out.print("Stock Quantity > ");
-			sQty = sc.nextInt();
-			System.out.print("Are you sure to update this record? [Y/N] > ");
-			String check = sc.next();
-			switch (check) {
-			case "y" : case "Y" : table.set(index, new Product(id, name, unitPrice, sQty, fdate)); Collections.reverse(table); break;
+			case "y" : case "Y" : table.set(index, new Product(id, name, unitPrice, sQty, fdate)); Collections.reverse(table); 
+			System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"); break;
 			case "n" : case "N" : Collections.reverse(table); break;
 			default:
 				System.out.println("You have entered the invalid command.");
@@ -402,8 +410,68 @@ public class Stock {
 			displayingProduct(page, row);
 		}
 		
-		//method delete
-		public void delete() {
+		//Update Name of Product with the selected ProID
+		public static void updateName(int id){
+			int index = id - 1;
+			System.out.print("Name > ");
+			name = sc.next();
+			System.out.print("Are you sure to update this record? [Y/N] > ");
+			String check = sc.next();
+			switch (check) {
+			case "y" : case "Y" : table.set(index, new Product(id, name, unitPrice, sQty, fdate)); Collections.reverse(table); 
+			System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"); break;
+			case "n" : case "N" : Collections.reverse(table); break;
+			default:
+				System.out.println("You have entered the invalid command.");
+				System.out.print("Are you sure to update this record? [Y/N] > ");
+				check = sc.next();
+				break;
+			}
+			displayingProduct(page, row);
+		}
+		
+		//Update unit price of product with the selected ProID
+		public static void updateUnitPrice(int id){
+			int index = id - 1;
+			System.out.print("Unit Price > ");
+			unitPrice = sc.nextDouble();
+			System.out.print("Are you sure to update this record? [Y/N] > ");
+			String check = sc.next();
+			switch (check) {
+			case "y" : case "Y" : table.set(index, new Product(id, name, unitPrice, sQty, fdate)); Collections.reverse(table); 
+			System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"); break;
+			case "n" : case "N" : Collections.reverse(table); break;
+			default:
+				System.out.println("You have entered the invalid command.");
+				System.out.print("Are you sure to update this record? [Y/N] > ");
+				check = sc.next();
+				break;
+			}
+			displayingProduct(page, row);
+		}
+		
+		//Update stock qty of product with the selected ProID
+		public static void updateStockQty(int id){
+			int index = id - 1;
+			System.out.print("Stock Quantity > ");
+			sQty = sc.nextInt();
+			System.out.print("Are you sure to update this record? [Y/N] > ");
+			String check = sc.next();
+			switch (check) {
+			case "y" : case "Y" : table.set(index, new Product(id, name, unitPrice, sQty, fdate)); Collections.reverse(table); 
+			System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"); break;
+			case "n" : case "N" : Collections.reverse(table); break;
+			default:
+				System.out.println("You have entered the invalid command.");
+				System.out.print("Are you sure to update this record? [Y/N] > ");
+				check = sc.next();
+				break;
+			}
+			displayingProduct(page, row);
+		}
+		
+		//Delete one data from database with its ID
+		public static void delete() {
 			reverseTable();
 			System.out.print("Product ID > ");
 			int ProID = sc.nextInt();
@@ -417,7 +485,8 @@ public class Stock {
 				System.out.print("Are you sure to delete this record? [Y/N] > ");
 				String check = sc.next();
 				switch (check) {
-				case "y" : case "Y" : table.remove(index); Collections.reverse(table); break;
+				case "y" : case "Y" : table.remove(index); Collections.reverse(table); 
+				System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"); break;
 				case "n" : case "N" : Collections.reverse(table); break;
 				default:
 					System.out.println("You have entered the invalid command.");
@@ -432,50 +501,147 @@ public class Stock {
 		
 		//Pagination and search not yet done
 		//method toFirst
-		public void tofirst() {
-			System.out.println("TO FIRST !");
+		public static void tofirst() {
+			paginationToFirst();
 		}
 		
 		//method toLast
-		public void tolast() {
-			System.out.println("TO LAST !");
+		public static void tolast() {
+			paginationToLast();
 		}
 		
 		//method moveNext
-		public void tonext() {
+		public static void tonext() {
 			System.out.println("TO NEXT !");
 		}
 		
 		//method movePrevious
-		public void toprevious() {
+		public static void toprevious() {
 			System.out.println("TO PREVIOUS !");
 		}
 		
 		//method search
-		public void search() {
-			System.out.println("SEARCH !");
+		//search all name in table
+		public static int[] searchArr(String search) {
+			
+			ArrayList<Integer> found = new ArrayList<>();
+			for (int i = 0; i < table.size(); i++) {
+				if (table.get(i).getName().equals(search.trim())) found.add(i);
+			}
+			int []foundIndex = found.stream().mapToInt(i -> i).toArray();
+			return foundIndex;
+		} 
+		public static void search(String search) {
+			System.out.print("Enter Product Name > ");
+			Search = sc.next();
+			search = Search.toString();
+			int inter = 0;
+			
+			System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+			if ((inter = searchArr(search).length) > 0) {
+				
+				int col = 5;
+				int startPage = selectRecordByStartPage(page, row);
+				int pages = totalPages(inter, row);
+				
+				Table t = new Table(5,BorderStyle.UNICODE_BOX_DOUBLE_BORDER,ShownBorders.ALL);
+				CellStyle numbers = new CellStyle(HorizontalAlign.center);
+				
+			// Header of Table
+				t.setColumnWidth(0, 15, 30);
+			    t.setColumnWidth(1, 15, 30);
+			    t.setColumnWidth(2, 15, 30);
+			    t.setColumnWidth(3, 15, 30);
+			    t.setColumnWidth(4, 15, 30);
+			    t.addCell("ID", numbers);
+			    t.addCell("name", numbers);
+			    t.addCell("Unit Price", numbers);
+			    t.addCell("Quantity", numbers);
+			    t.addCell("Imported Date",numbers);
+			    
+			 // Body of Table
+			 			for (int i = 0; i < inter; i++) {
+			 				if (i < table.size()) {
+			 					id = table.get((searchArr(search)[i])).getId();
+			 					name = table.get((searchArr(search)[i])).getName();
+			 					unitPrice = table.get((searchArr(search)[i])).getUnitPrice();
+			 					sQty = table.get((searchArr(search)[i])).getsQty();
+			 					String date = table.get((searchArr(search)[i])).getiDate();
+
+			 			    	t.addCell(""+id, numbers);
+			 			    	t.addCell(""+name, numbers);
+			 			    	t.addCell(""+unitPrice, numbers);
+			 			    	t.addCell(""+sQty, numbers);
+			 			    	t.addCell(""+date, numbers);
+			 				}
+			 			}
+			 		System.out.println(t.render());
+			 		
+			 // Footer of Table
+				System.out.println("\n\t\t\tPage: " + page + "/" + pages + " =||= " + "Total: " + inter + "\t\t\n");
+				tableMeu();
+			}else{
+				System.out.println("Not found !");
+			}
 		}
 		
 		//Going to Specific page
-		public void goTo(){
+		public static void goTo(){
 			int goPage = sc.nextInt();
+			System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 			displayingProduct(goPage, row);
+			
 		}
 		//End description of Pagination and Search 
+		
+		//Saving data to Database
+		public static void save(){
+			try(ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new  FileOutputStream("file/db.tmp")))){
+				reverseTable();
+				oos.writeObject(table);
+				Collections.reverse(table);
+				tableMeu();
+			} catch (FileNotFoundException e) {
+				System.err.println("File Not Found!");
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 		 
 		
 		
 		//Set Showing record
-		public void setShowingRecord(){
+		public static void setShowingRecord(){
 			setRow = sc.nextInt();
+			System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 			displayingProduct(page, setRow);
+			
 		}
 		
 		//Reversing table 
-		public void reverseTable(){
+		public static void reverseTable(){
 			if(table.get(0).getId() != 1)
+				
 				Collections.reverse(table);
 		}
+		
+		//Reversing Page 
+				public static void paginationToFirst(){
+					if(table.get(0).getId() == 1){
+						Collections.reverse(table);
+					}
+					System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+					displayingProduct(page, row);
+				}
+				public static void paginationToLast(){
+					int last = totalPages(table.size(), row);
+					System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+					displayingProduct(last, row);
+				}
+		
+		
+		
 		
 
 }
