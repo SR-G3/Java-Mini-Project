@@ -76,7 +76,7 @@ public class Stock {
 		this.row = row;
 		// read data from file
 		try (ObjectInputStream ois = new ObjectInputStream(
-				new BufferedInputStream(new FileInputStream("file/db.g3")))) {
+				new BufferedInputStream(new FileInputStream("file/db.tmp")))) {
 			long start = System.currentTimeMillis();
 			// ArrayList<Product> table = null;
 			table = (ArrayList<Product>) ois.readObject();
@@ -144,8 +144,8 @@ public class Stock {
 					case 'u': case 'U': update(); break;
 					case 'f': case 'F': tofirst(); break;
 					case 'l': case 'L': tolast(); break;
-					case 'n': case 'N': tonext(); break;
-					case 'p': case 'P': toprevious(); break;
+					case 'n': case 'N': paginationToNext(); break;
+					case 'p': case 'P': paginationToPre(); break;
 					case 's': case 'S': search((String) Search); break;
 					case 'g': case 'G': System.out.print("Go to specific page: "); goTo(); break;
 					case 'e': case 'E': System.out.println("GoodBye");System.exit(0); break;
@@ -365,8 +365,7 @@ public class Stock {
 				case "E"  : case "e"  : Collections.reverse(table);displayingProduct(page, row); break;
 				default:
 					System.out.println(error_al);
-					System.out.print("What do you want to update?\n (Al)All\t(N)Name\t(Up)Unit Price\t(Q)Stock Quantity\t(E)Exit > ");
-					choose = sc.next();
+					tableMeu();
 					break;
 				}
 			}
@@ -500,15 +499,6 @@ public class Stock {
 			paginationToLast();
 		}
 		
-		//method moveNext
-		public static void tonext() {
-			System.out.println("TO NEXT !");
-		}
-		
-		//method movePrevious
-		public static void toprevious() {
-			System.out.println("TO PREVIOUS !");
-		}
 		
 		//method search
 		//search all name in table
@@ -533,13 +523,11 @@ public class Stock {
 			Product P= (Product) itr.next();
 			ArrayList aSearch = new ArrayList<>();
 			
+			int col = 5;
+			int startPage = selectRecordByStartPage(inter, row);
+			
 			System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 			if ((inter = table.size()) > 0) {
-				
-				int col = 5;
-				int startPage = selectRecordByStartPage(page, row);
-				int pages = totalPages(inter, row);
-				
 				
 				
 				Table t = new Table(5,BorderStyle.UNICODE_BOX_DOUBLE_BORDER,ShownBorders.ALL);
@@ -581,23 +569,10 @@ public class Stock {
 				 			    	t.addCell(""+dateFormat.format(date).toString(), numbers);
 								//}
 							}
-//			 				if (i < table.size()) {
-//			 					id = table.get((searchArr(search)[i])).getId();
-//			 					name = table.get((searchArr(search)[i])).getName();
-//			 					unitPrice = table.get((searchArr(search)[i])).getUnitPrice();
-//			 					sQty = table.get((searchArr(search)[i])).getsQty();
-//			 					String date = table.get((searchArr(search)[i])).getiDate();
-//
-//			 			    	t.addCell(""+id, numbers);
-//			 			    	t.addCell(""+name, numbers);
-//			 			    	t.addCell(""+unitPrice, numbers);
-//			 			    	t.addCell(""+sQty, numbers);
-//			 			    	t.addCell(""+date, numbers);
-//			 				}
-			 			//}
 			 		System.out.println(t.render());
 			 		
 			 // Footer of Table
+			 		int pages = totalPages(aSearch.size(), row);
 				System.out.println("\n\t\t\tPage: " + page + "/" + pages + " =||= " + "Total: " + aSearch.size() + "\t\t\n");
 				tableMeu();
 			}else{
@@ -676,6 +651,24 @@ public class Stock {
 					int last = totalPages(table.size(), row);
 					System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 					displayingProduct(last, row);
+				}
+		
+		//Pagination Next
+				public static void paginationToNext() {
+					if (table.get(0).getId() == 1) {
+						Collections.reverse(table);
+					}
+					System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+					displayingProduct(page += 1, row);
+				}
+				
+		//Pagination Previous
+				public static void paginationToPre() {
+					if (table.get(0).getId() == 1) {
+						Collections.reverse(table);
+					}
+					System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+					displayingProduct(page -= 1, row);
 				}
 		
 		

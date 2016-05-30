@@ -12,7 +12,7 @@ public class Run {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		wr.insertProductToDB((int) 1E6);
+		//wr.insertProductToDB((int) 1E5);
 		wr.selectProductFromDB(1, 5);
 	}
 

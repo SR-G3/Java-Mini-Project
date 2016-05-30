@@ -10,7 +10,7 @@ public class Loading{
 			for (int i = 0; i < loading.length(); i++) {
 		        System.out.print(loading.charAt(i));
 		        try {
-					Thread.sleep(100);
+					Thread.sleep(20);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
