@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
@@ -36,8 +37,8 @@ public class Stock {
 	static Date date = new Date();
 	static String fdate = dateFormat.format(date).toString();
 	private static final String validLetter = "[*wWrRdDuUfFlLnNpPsSgGEe]|(se|Se)|(sa|Sa)", validNumber = "-?\\d+(\\.\\d+)?";
-	static String error_al = "You have type a wrong command!"; 
-	static String Search;
+	static String error_al = "You have entered the invalid command."; 
+	static CharSequence Search;
 	
 	
 	// method for performing insertion task
@@ -47,7 +48,6 @@ public class Stock {
 		// write data to file
 		try (ObjectOutputStream oos = new ObjectOutputStream(
 				new BufferedOutputStream(new FileOutputStream("file/db.g3")))) {
-			// Product pro = new Product("Coca-Cola", 2.0, 5, fdate);
 			long start = System.currentTimeMillis();
 			for (int i = 0; i < data; i++) {
 				currentID = i + 1;
@@ -132,18 +132,7 @@ public class Stock {
 					setShowingRecord();
 					}else if(str.equals("Sa")||str.equals("sa")){
 						
-						System.out.print("Are you sure to update this record? [Y/N] > ");
-						String check = sc.next();
-						switch (check) {
-						case "y" : case "Y" : System.out.println("Your data had been successfully saved to database."); save();
-						System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"); break;
-						case "n" : case "N" : Collections.reverse(table); break;
-						default:
-							System.out.println("You have entered the invalid command.");
-							System.out.print("Are you sure to update this record? [Y/N] > ");
-							check = sc.next();
-							break;
-						}	
+						saveConfirmation();
 					}
 				}else {
 					x = str.charAt(0);
@@ -157,7 +146,7 @@ public class Stock {
 					case 'l': case 'L': tolast(); break;
 					case 'n': case 'N': tonext(); break;
 					case 'p': case 'P': toprevious(); break;
-					case 's': case 'S': search(Search); break;
+					case 's': case 'S': search((String) Search); break;
 					case 'g': case 'G': System.out.print("Go to specific page: "); goTo(); break;
 					case 'e': case 'E': System.out.println("GoodBye");System.exit(0); break;
 					}
@@ -307,7 +296,7 @@ public class Stock {
 			case "y" : case "Y" : table.add(new Product(ProID, name, unitPrice, sQty, fdate)); Collections.reverse(table); break;
 			case "n" : case "N" : Collections.reverse(table); break;
 			default:
-				System.out.println("You have entered the invalid command.");
+				System.out.println(error_al);
 				System.out.print("Are you sure to save this new record? [Y/N] > ");
 				check = sc.next();
 				break;
@@ -361,6 +350,7 @@ public class Stock {
 			System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 			if(ProID > table.size()){
 				System.out.println("Could not be found the product that is matched to your input Product ID!");
+				update();
 			}else{
 			System.out.println("==========Update information of Product with ID: " + ProID + "==========");
 			showProductDetail(ProID);
@@ -374,7 +364,7 @@ public class Stock {
 				case "Q"  : case "q"  : updateStockQty(ProID); break;
 				case "E"  : case "e"  : Collections.reverse(table);displayingProduct(page, row); break;
 				default:
-					System.out.println("You have entered the invalid command.");
+					System.out.println(error_al);
 					System.out.print("What do you want to update?\n (Al)All\t(N)Name\t(Up)Unit Price\t(Q)Stock Quantity\t(E)Exit > ");
 					choose = sc.next();
 					break;
@@ -402,7 +392,7 @@ public class Stock {
 			System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"); break;
 			case "n" : case "N" : Collections.reverse(table); break;
 			default:
-				System.out.println("You have entered the invalid command.");
+				System.out.println(error_al);
 				System.out.print("Are you sure to update this record? [Y/N] > ");
 				check = sc.next();
 				break;
@@ -422,7 +412,7 @@ public class Stock {
 			System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"); break;
 			case "n" : case "N" : Collections.reverse(table); break;
 			default:
-				System.out.println("You have entered the invalid command.");
+				System.out.println(error_al);
 				System.out.print("Are you sure to update this record? [Y/N] > ");
 				check = sc.next();
 				break;
@@ -442,7 +432,7 @@ public class Stock {
 			System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"); break;
 			case "n" : case "N" : Collections.reverse(table); break;
 			default:
-				System.out.println("You have entered the invalid command.");
+				System.out.println(error_al);
 				System.out.print("Are you sure to update this record? [Y/N] > ");
 				check = sc.next();
 				break;
@@ -462,7 +452,7 @@ public class Stock {
 			System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"); break;
 			case "n" : case "N" : Collections.reverse(table); break;
 			default:
-				System.out.println("You have entered the invalid command.");
+				System.out.println(error_al);
 				System.out.print("Are you sure to update this record? [Y/N] > ");
 				check = sc.next();
 				break;
@@ -489,7 +479,7 @@ public class Stock {
 				System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"); break;
 				case "n" : case "N" : Collections.reverse(table); break;
 				default:
-					System.out.println("You have entered the invalid command.");
+					System.out.println(error_al);
 					System.out.print("Are you sure to update this record? [Y/N] > ");
 					check = sc.next();
 					break;
@@ -532,17 +522,25 @@ public class Stock {
 			return foundIndex;
 		} 
 		public static void search(String search) {
+			Scanner sc = new Scanner(System.in);
+			
 			System.out.print("Enter Product Name > ");
-			Search = sc.next();
+			Search = sc.nextLine();
 			search = Search.toString();
 			int inter = 0;
 			
+			Iterator itr = table.iterator();
+			Product P= (Product) itr.next();
+			ArrayList aSearch = new ArrayList<>();
+			
 			System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-			if ((inter = searchArr(search).length) > 0) {
+			if ((inter = table.size()) > 0) {
 				
 				int col = 5;
 				int startPage = selectRecordByStartPage(page, row);
 				int pages = totalPages(inter, row);
+				
+				
 				
 				Table t = new Table(5,BorderStyle.UNICODE_BOX_DOUBLE_BORDER,ShownBorders.ALL);
 				CellStyle numbers = new CellStyle(HorizontalAlign.center);
@@ -561,27 +559,51 @@ public class Stock {
 			    
 			 // Body of Table
 			 			for (int i = 0; i < inter; i++) {
-			 				if (i < table.size()) {
-			 					id = table.get((searchArr(search)[i])).getId();
-			 					name = table.get((searchArr(search)[i])).getName();
-			 					unitPrice = table.get((searchArr(search)[i])).getUnitPrice();
-			 					sQty = table.get((searchArr(search)[i])).getsQty();
-			 					String date = table.get((searchArr(search)[i])).getiDate();
-
-			 			    	t.addCell(""+id, numbers);
-			 			    	t.addCell(""+name, numbers);
-			 			    	t.addCell(""+unitPrice, numbers);
-			 			    	t.addCell(""+sQty, numbers);
-			 			    	t.addCell(""+date, numbers);
-			 				}
+			 				if(((Product)table.get(i)).getName().contains(search) || ((Product)table.get(i)).getName().equalsIgnoreCase((String)search))
+							{
+								aSearch.add(table.get(i));
+							}
 			 			}
+			 				Iterator ii = aSearch.iterator();
+							while (ii.hasNext()) {
+								//if (i < table.size()) {
+									Product PP =(Product)ii.next();
+									id = PP.getId();
+				 					name = PP.getName();
+				 					unitPrice = PP.getUnitPrice();
+				 					sQty = PP.getsQty();
+				 					
+									
+				 			    	t.addCell(""+id, numbers);
+				 			    	t.addCell(""+name, numbers);
+				 			    	t.addCell(""+unitPrice, numbers);
+				 			    	t.addCell(""+sQty, numbers);
+				 			    	t.addCell(""+dateFormat.format(date).toString(), numbers);
+								//}
+							}
+//			 				if (i < table.size()) {
+//			 					id = table.get((searchArr(search)[i])).getId();
+//			 					name = table.get((searchArr(search)[i])).getName();
+//			 					unitPrice = table.get((searchArr(search)[i])).getUnitPrice();
+//			 					sQty = table.get((searchArr(search)[i])).getsQty();
+//			 					String date = table.get((searchArr(search)[i])).getiDate();
+//
+//			 			    	t.addCell(""+id, numbers);
+//			 			    	t.addCell(""+name, numbers);
+//			 			    	t.addCell(""+unitPrice, numbers);
+//			 			    	t.addCell(""+sQty, numbers);
+//			 			    	t.addCell(""+date, numbers);
+//			 				}
+			 			//}
 			 		System.out.println(t.render());
 			 		
 			 // Footer of Table
-				System.out.println("\n\t\t\tPage: " + page + "/" + pages + " =||= " + "Total: " + inter + "\t\t\n");
+				System.out.println("\n\t\t\tPage: " + page + "/" + pages + " =||= " + "Total: " + aSearch.size() + "\t\t\n");
 				tableMeu();
 			}else{
+				System.out.println(Search);
 				System.out.println("Not found !");
+				search((String) Search);
 			}
 		}
 		
@@ -607,6 +629,22 @@ public class Stock {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		}
+		
+		//Save confirmation
+		public static void saveConfirmation(){
+			System.out.print("Are you sure to update this record? [Y/N] > ");
+			String check = sc.next();
+			switch (check) {
+			case "y" : case "Y" : System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+								  System.out.println("Your data had been successfully saved to database."); save(); break;
+			case "n" : case "N" : System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"); tableMeu(); break;
+			default:
+				System.out.println(error_al);
+				System.out.print("Are you sure to update this record? [Y/N] > ");
+				check = sc.next();
+				break;
+			}	
 		}
 		 
 		
